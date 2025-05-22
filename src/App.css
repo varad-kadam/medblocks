@@ -1,42 +1,151 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+/* App.css */
+
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+
+:root {
+  --primary-color: #2563EB; 
+  --background-color: #f6f8fb;
+  --input-border-color: #e0eaf4;
+  --text-color: #141f2a;
+  --subtext-color: #5a7083;
+  --input-text-color: #ffffff; 
+  --input-placeholder-color: #ffffffa0; 
+  --font-family: 'DM Sans', sans-serif;
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.App {
+  width: 100%;
+  max-width: 600px;
   padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
   text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  font-size: 2rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.inputForm form {
+  display: flex;
+  flex-direction: column;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.inputForm label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.inputForm input[type="text"],
+.inputForm input[type="email"],
+.inputForm input[type="date"] {
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--input-border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--input-text-color);
+  background-color: #141f2a; 
+  transition: border-color 0.3s;
 }
 
-.card {
-  padding: 2em;
+.inputForm input::placeholder {
+  color: var(--input-placeholder-color);
+  opacity: 1; 
 }
 
-.read-the-docs {
-  color: #888;
+.inputForm input[type="text"]:focus,
+.inputForm input[type="email"]:focus,
+.inputForm input[type="date"]:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+/* Radio group styling */
+.inputForm .radio-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+
+.inputForm input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid var(--subtext-color);
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+.inputForm input[type="radio"]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 0.6em;
+  height: 0.6em;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+  transition: transform 0.2s ease-in-out;
+}
+
+.inputForm input[type="radio"]:checked {
+  border-color: var(--primary-color);
+}
+
+.inputForm input[type="radio"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Buttons */
+.inputForm button {
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.inputForm button[type="submit"] {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.inputForm button[type="submit"]:hover {
+  background-color: #1e4bb8;
+}
+
+.inputForm button[type="button"] {
+  background-color: #e0eaf4;
+  color: var(--text-color);
+  margin-right: 1rem;
+}
+
+.inputForm button[type="button"]:hover {
+  background-color: #cbd5e0;
 }
