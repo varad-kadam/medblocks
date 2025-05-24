@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from 'react'
 import './InputForm.css'
+import { useDatabase } from '../../hooks/useDatabase'; // Adjust path as needed
 
 const STORAGE_KEY = 'patientFormData'
 const defaultValues = {
@@ -23,13 +24,8 @@ function InputForm() {
     const [formErrors, setformErrors] = useState({})
     const [isSubmit, setisSubmit] = useState(false)
 
-    useEffect(() => {
-        console.log(formErrors)
-        if (Object.keys(formErrors) === 0 && isSubmit) {
-            console.log(values)
-        }
+    const { isReady, savePatient, getAllPatients } = useDatabase();
 
-    }, [formErrors])
 
     // Initialize from localStorage if available
     const [values, setValues] = useState(() => {
@@ -76,31 +72,75 @@ function InputForm() {
         const dob = new Date(values.dob)
 
         if (values.email && !emailRegex.test(values.email)) {
-                errors.email = "This is not a valid email."
+            errors.email = "This is not a valid email."
         }
 
         if (values.mrn.length != 8) {
             errors.mrn = "MRN must be 8 charaters long."
         }
 
-        if (values.dob){
-            if(dob > today){
+        if (values.dob) {
+            if (dob > today) {
                 errors.dob = "Date of Birth cannot be in the future."
             }
             else {
                 const yearsAgo = today.getFullYear() - dob.getFullYear()
-                if(yearsAgo > 150){
+                if (yearsAgo > 150) {
                     errors.dob = "Date of Birth cannot be greater than 150 years"
                 }
             }
-            
+
         }
 
         // Similarly for Register Date, Phone, etc.
-        
-
         return errors
     }
+
+    useEffect(() => {
+        console.log(formErrors)
+        if (Object.keys(formErrors).length === 0 && isSubmit) {
+            console.log(values)
+            saveToDatabase()
+        }
+    }, [formErrors, isReady, values, isSubmit])
+
+    const saveToDatabase = async () => {
+        if (!isReady) {
+            alert('Database not ready yet');
+            return;
+        }
+
+        try {
+            const dbData = {
+                firstName: values.firstName,
+                lastName: values.lastName,
+                dateOfBirth: values.dob,
+                gender: values.sex,
+                phone: values.phone,
+                email: values.email,
+                address: values.address,
+                emergencyContactName: values.emerConName,
+                emergencyContactPhone: values.emerConPhone,
+                medicalRecordNumber: values.mrn
+            };
+
+            await savePatient(dbData);
+            alert('Patient saved successfully!');
+            handleReset(); // Reset form after successful save
+        } catch (error) {
+            alert('Error saving patient: ' + error.message);
+        }
+    };
+
+    const viewDatabase = async () => {
+        try {
+            const patients = await getAllPatients();
+            console.table(patients); // Shows data in a nice table format in browser console
+            alert(`Found ${patients.length} patients. Check browser console for details.`);
+        } catch (error) {
+            alert('Error fetching patients: ' + error.message);
+        }
+    };
 
     return (
         <div className="inputForm">
@@ -221,6 +261,7 @@ function InputForm() {
 
                 <button type='button' onClick={handleReset}>Reset</button>
                 <button type='submit'>Submit</button>
+                <button type='button' onClick={viewDatabase}>View Database</button>
             </form>
         </div>
     )
