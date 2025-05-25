@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from 'react'
 import './InputForm.css'
-import { useDatabase } from '../../hooks/useDatabase'; // Adjust path as needed
+import { useDatabase } from '../../hooks/useDatabase';
 
 const STORAGE_KEY = 'patientFormData'
 const defaultValues = {
@@ -135,7 +135,7 @@ function InputForm() {
     const viewDatabase = async () => {
         try {
             const patients = await getAllPatients();
-            console.table(patients); // Shows data in a nice table format in browser console
+            console.table(patients); 
             alert(`Found ${patients.length} patients. Check browser console for details.`);
         } catch (error) {
             alert('Error fetching patients: ' + error.message);

@@ -87,9 +87,28 @@ export const useDatabase = () => {
     }
   };
 
+  const runQuery = async (query) => {
+    if (!db || !isReady) {
+      throw new Error('Database not ready');
+    }
+
+    try {
+      const result = await db.query(query);
+      return {
+        rows: result.rows,
+        rowCount: result.rowCount,
+        fields: result.fields
+      };
+    } catch (error) {
+      console.error('Failed to run query:', error);
+      throw error;
+    }
+  };
+
   return {
     isReady,
     savePatient,
-    getAllPatients
+    getAllPatients,
+    runQuery
   };
 };
