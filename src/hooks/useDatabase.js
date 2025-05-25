@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { PGlite } from '@electric-sql/pglite';
+import { PGliteWorker } from '@electric-sql/pglite/worker';
 
-// Singleton database instance and readiness flag
 let dbInstance = null;
 let isDbReady = false;
 
@@ -11,40 +10,24 @@ export const useDatabase = () => {
   useEffect(() => {
     const initDatabase = async () => {
       if (dbInstance) {
-        // Reuse existing instance
         setIsReady(true);
         return;
       }
 
       try {
-        // Initialize new database
-        dbInstance = new PGlite({ dataDir: 'idb://patient-db' });
-        
-        // Create table
-        await dbInstance.exec(`
-          CREATE TABLE IF NOT EXISTS patients (
-            id SERIAL PRIMARY KEY,
-            first_name VARCHAR(50) NOT NULL,
-            last_name VARCHAR(50) NOT NULL,
-            date_of_birth DATE NOT NULL,
-            gender VARCHAR(10) NOT NULL,
-            phone VARCHAR(12) NOT NULL,
-            email VARCHAR(100) NOT NULL,
-            address TEXT,
-            emergency_contact_name VARCHAR(100),
-            emergency_contact_phone VARCHAR(15),
-            medical_record_number VARCHAR(20) UNIQUE NOT NULL,
-            registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          )
-        `);
+        const workerThread = new Worker(new URL('../workers/pglite-worker.js', import.meta.url), {
+          type: 'module',
+        });
 
-        // Update global and local state
+        dbInstance = new PGliteWorker(workerThread);
+
+        // Wait for readiness (optional — some ops may fail if run too early)
+        await dbInstance.query('SELECT 1');
+
         isDbReady = true;
         setIsReady(true);
       } catch (error) {
-        console.error('Failed to initialize database:', error);
+        console.error('Failed to initialize database worker:', error);
       }
     };
 
@@ -52,9 +35,7 @@ export const useDatabase = () => {
   }, []);
 
   const savePatient = async (patientData) => {
-    if (!isDbReady) {
-      throw new Error('Database not ready');
-    }
+    if (!isDbReady) throw new Error('Database not ready');
 
     try {
       const result = await dbInstance.query(
@@ -83,9 +64,7 @@ export const useDatabase = () => {
   };
 
   const getAllPatients = async () => {
-    if (!isDbReady) {
-      throw new Error('Database not ready');
-    }
+    if (!isDbReady) throw new Error('Database not ready');
 
     try {
       const result = await dbInstance.query('SELECT * FROM patients ORDER BY created_at DESC');
@@ -97,9 +76,7 @@ export const useDatabase = () => {
   };
 
   const runQuery = async (query) => {
-    if (!isDbReady) {
-      throw new Error('Database not ready');
-    }
+    if (!isDbReady) throw new Error('Database not ready');
 
     try {
       const result = await dbInstance.query(query);
