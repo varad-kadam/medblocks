@@ -8,7 +8,9 @@ export const useDatabase = () => {
   useEffect(() => {
     const initDatabase = async () => {
       try {
-        const database = new PGlite();
+        const database = new PGlite({
+          dataDir: 'idb://patient-db'
+        });
         
         // Create patients table
         await database.exec(`
